@@ -33,16 +33,24 @@ main()
 
   PtgModel* model = PtgModel_New(device);
 
+  //=========================//
+  // Apply sinusoidal brush. //
+  //=========================//
+
   PtgModel_SetBrushSize(model, 25.0f);
 
   PtgModel_BeginPath(model);
 
-  const int steps = 128;
+  const int steps = 32;
 
   for (int i = 0; i < steps; i++)
     PtgModel_PlotPath(model, i * 1000.0f / steps, 500.0f + 500.0f * sin(6.28f * static_cast<float>(i) / steps));
 
   PtgModel_EndPath(model);
+
+  //========================//
+  // Compute Output Terrain //
+  //========================//
 
   PtgOutput* output = PtgOutput_New(device, 256);
 
@@ -52,6 +60,29 @@ main()
     PtgOutput_IterateBake(output);
 
   PtgOutput_SaveHeightPng(output, "result.png", stbi_write_png);
+
+  //================//
+  // Render Terrain //
+  //================//
+
+  PtgRender* render = PtgRender_New(device, 512);
+
+  PtgRender_SetCameraPosition(render, 0, 10, 0);
+
+  PtgRender_SetCameraRotation(render, 90, 0, 0);
+
+  PtgRender_SetCameraPerspective(render, 1.0f, 45.0f, 0.01f, 2000.0f);
+
+  for (int i = 0; i < 16; i++)
+    PtgRender_Iterate(render);
+
+  PtgRender_SavePng(render, "render.png", stbi_write_png);
+
+  PtgRender_Delete(render);
+
+  //=========//
+  // Cleanup //
+  //=========//
 
   PtgOutput_Delete(output);
 

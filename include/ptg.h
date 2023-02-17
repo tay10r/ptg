@@ -8,11 +8,15 @@ extern "C"
 {
 #endif
 
+/**************
+ * Device API *
+ **************/
+
 /**
- * @defgroup ptg_device Device API
- *
- * @brief The API for dealing the compute engine.
- * */
+* @defgroup ptg_device Device API
+*
+* @brief The API for dealing the compute engine.
+* */
 
 /**
  * @brief Used to indicating the severity of a log record.
@@ -94,6 +98,10 @@ PtgDevice_New(ptg_gl_symbol_loader gl_symbol_loader, void* logger_data, ptg_log_
 void
 PtgDevice_Delete(PtgDevice* device);
 
+/*************
+ * Model API *
+ *************/
+
 /**
  * @defgroup ptg_model Model API
  *
@@ -172,6 +180,10 @@ PtgModel_PlotPath(PtgModel* model, float x, float y);
 
 void
 PtgModel_EndPath(PtgModel* model);
+
+/**************
+ * Output API *
+ **************/
 
 /**
  * @defgroup ptg_output Output API
@@ -269,6 +281,46 @@ PtgOutput_IterateBake(PtgOutput* output);
  */
 bool
 PtgOutput_SaveHeightPng(PtgOutput* output, const char* path, ptg_write_png png_write_function);
+
+/**************
+ * Render API *
+ **************/
+
+/**
+ * @defgroup prg_render Render API
+ *
+ * @brief The API used for creating renders of the terrain.
+ */
+
+/**
+ * @brief A type definition for a render object.
+ *        This object contains the result of a rendering object.
+ *        Render is treated as a noun in the naming.
+ *
+ * @ingroup ptg_render
+ */
+typedef struct ptg_render PtgRender;
+
+PtgRender*
+PtgRender_New(PtgDevice* device, uint32_t image_size);
+
+void
+PtgRender_Delete(PtgRender* render);
+
+void
+PtgRender_SetCameraPosition(PtgRender* render, float x, float y, float z);
+
+void
+PtgRender_SetCameraRotation(PtgRender* render, float x, float y, float z);
+
+void
+PtgRender_SetCameraPerspective(PtgRender* render, float aspect, float fovy, float near, float far);
+
+void
+PtgRender_Iterate(PtgRender* render);
+
+void
+PtgRender_SavePng(PtgRender* render, const char* path, ptg_write_png png_writer);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -3,7 +3,8 @@
 #include "texture.hpp"
 #include "kernel_registry.hpp"
 
-#include "kernels/raise.hpp"
+#include "kernels/raise_kernel.hpp"
+#include "kernels/render_kernel.hpp"
 
 #include <vector>
 
@@ -16,24 +17,24 @@ class cpu_texture final : public texture
 public:
   explicit cpu_texture(const uint32_t size)
     : size_(size)
-      , data_(size * size / 4, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f))
+      , data_(size * size, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f))
   {
   }
 
   void read_data(float* data) override
   {
-    const uint32_t size = size_ / 2;
+    for (uint32_t y = 0; y < size_; y++) {
 
-    for (uint32_t y = 0; y < size; y++) {
+      for (uint32_t x = 0; x < size_; x++) {
 
-      for (uint32_t x = 0; x < size; x++) {
+        const glm::vec4 t = data_[(y * size_) + x];
 
-        const glm::vec4 t = data_[(y * size) + x];
+        const auto offset = ((y * size_) + x) * 4;
 
-        data[(((y * 2) + 0) * size_) + (x * 2) + 0] = t.x;
-        data[(((y * 2) + 0) * size_) + (x * 2) + 1] = t.y;
-        data[(((y * 2) + 1) * size_) + (x * 2) + 0] = t.z;
-        data[(((y * 2) + 1) * size_) + (x * 2) + 1] = t.w;
+        data[offset + 0] = t.r;
+        data[offset + 1] = t.g;
+        data[offset + 2] = t.b;
+        data[offset + 3] = t.a;
       }
     }
   }
@@ -99,7 +100,9 @@ private:
 
   raise_kernel raise_kernel_;
 
-  const kernel_registry kernel_registry_{ &raise_kernel_ };
+  render_kernel render_kernel_;
+
+  const kernel_registry kernel_registry_{ &raise_kernel_, &render_kernel_ };
 
   void* logger_data_{ nullptr };
 

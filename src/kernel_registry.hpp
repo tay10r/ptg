@@ -10,6 +10,9 @@ struct kernel_registry final
 {
   /// @brief Used for raising the terrain at a certain location.
   kernel* raise_kernel{ nullptr };
+
+  /// @brief Used for rendering the terrain.
+  kernel* render_kernel{ nullptr };
 };
 
 } // namespace ptg

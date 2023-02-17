@@ -7,11 +7,14 @@
 
 namespace ptg {
 
+// Note that texture axis sizes for terrain output are divided by two
+// since a single texel contains two values per axis (a texel is vec4).
+
 output::output(std::shared_ptr<device> dev, const uint32_t terrain_size)
   : device_(dev)
     , terrain_size_(terrain_size)
-    , rock_height_(dev->create_texture(terrain_size))
-    , soil_height_(dev->create_texture(terrain_size))
+    , rock_height_(dev->create_texture(terrain_size / 2))
+    , soil_height_(dev->create_texture(terrain_size / 2))
 {
 }
 
@@ -63,8 +66,23 @@ output::save_height_png(const char* path, ptg_write_png png_writer)
 
   const float scale = 255.0f / (max_h - min_h);
 
-  for (uint32_t i = 0; i < total_size; i++)
-    ldr_result[i] = clamp((hdr_result[i] - min_h) * scale);
+  for (uint32_t y = 0; y < terrain_size_; y += 2) {
+
+    for (uint32_t x = 0; x < terrain_size_; x += 2) {
+
+      const uint32_t i0 = ((y + 0) * terrain_size_) + (x + 0);
+      const uint32_t i1 = ((y + 0) * terrain_size_) + (x + 1);
+      const uint32_t i2 = ((y + 1) * terrain_size_) + (x + 0);
+      const uint32_t i3 = ((y + 1) * terrain_size_) + (x + 1);
+
+      const uint32_t dst = (y * terrain_size_) + x;
+
+      ldr_result[dst + 0] = clamp((hdr_result[i0] - min_h) * scale);
+      ldr_result[dst + 1] = clamp((hdr_result[i1] - min_h) * scale);
+      ldr_result[dst + 2] = clamp((hdr_result[i2] - min_h) * scale);
+      ldr_result[dst + 3] = clamp((hdr_result[i3] - min_h) * scale);
+    }
+  }
 
   return png_writer(path, terrain_size_, terrain_size_, 1, ldr_result.data(), terrain_size_);
 }

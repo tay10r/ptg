@@ -3,6 +3,11 @@
 #include "cpu_device.hpp"
 #include "model.hpp"
 #include "output.hpp"
+#include "render.hpp"
+
+//============//
+// Device API //
+//============//
 
 struct ptg_device
 {
@@ -25,6 +30,10 @@ PtgDevice_Delete(PtgDevice* device)
 {
   delete device;
 }
+
+//===========//
+// Model API //
+//===========//
 
 struct ptg_model
 {
@@ -67,6 +76,10 @@ PtgModel_PlotPath(PtgModel* model, float x, float y)
   model->impl.plot_path(x, y);
 }
 
+//============//
+// Output API //
+//============//
+
 struct ptg_output
 {
   ptg::output impl;
@@ -105,4 +118,63 @@ bool
 PtgOutput_SaveHeightPng(PtgOutput* output, const char* filename, ptg_write_png png_writer)
 {
   return output->impl.save_height_png(filename, png_writer);
+}
+
+//============//
+// Render API //
+//============//
+
+struct ptg_render
+{
+  ptg::render impl;
+};
+
+PtgRender*
+PtgRender_New(PtgDevice* device, uint32_t image_size)
+{
+  return new ptg_render{ ptg::render(device->impl, image_size) };
+}
+
+void
+PtgRender_Delete(PtgRender* render)
+{
+  delete render;
+}
+
+void
+PtgRender_SetCameraPosition(PtgRender* render, const float x, const float y, const float z)
+{
+  render->impl.get_camera()->position = glm::vec3(x, y, z);
+}
+
+void
+PtgRender_SetCameraRotation(PtgRender* render, const float x, const float y, const float z)
+{
+  render->impl.get_camera()->rotation = glm::vec3(x, y, z);
+}
+
+void
+PtgRender_SetCameraPerspective(PtgRender* render,
+                               const float aspect,
+                               const float fovy,
+                               const float near,
+                               const float far)
+{
+  auto* cam = render->impl.get_camera();
+  cam->aspect = aspect;
+  cam->fov = fovy;
+  cam->near = near;
+  cam->far = far;
+}
+
+void
+PtgRender_Iterate(PtgRender* render)
+{
+  render->impl.iterate();
+}
+
+void
+PtgRender_SavePng(PtgRender* render, const char* path, ptg_write_png png_writer)
+{
+  render->impl.save_to_png(path, png_writer);
 }

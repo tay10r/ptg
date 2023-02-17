@@ -20,8 +20,10 @@ set(glad_sources
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${glad_sources})
 
 set(cpu_kernels
-  src/kernels/raise.hpp
-  src/kernels/raise.cpp)
+  src/kernels/raise_kernel.hpp
+  src/kernels/raise_kernel.cpp
+  src/kernels/render_kernel.hpp
+  src/kernels/render_kernel.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" FILES ${cpu_kernels})
 
@@ -36,6 +38,8 @@ add_library(ptg
   src/cpu_device.cpp
   src/output.hpp
   src/output.cpp
+  src/render.hpp
+  src/render.cpp
   src/kernel.hpp
   src/kernel_registry.hpp
   src/kernel_registry.cpp
