@@ -2,10 +2,21 @@
 
 namespace ptg {
 
+model::model(std::shared_ptr<device> dev)
+  : device_(std::move(dev))
+{
+}
+
 memento
 model::copy_current_memento() const
 {
   return *current();
+}
+
+void
+model::set_brush_size(const float brush_size)
+{
+  edit()->brush_size = brush_size;
 }
 
 void
@@ -16,7 +27,7 @@ model::begin_path()
     return;
   }
 
-  active_path_ = path{ current()->brush_size };
+  active_path_ = path{ current()->brush_size, {}, current()->active_layer };
 }
 
 void

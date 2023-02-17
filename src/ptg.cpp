@@ -10,12 +10,12 @@ struct ptg_device
 };
 
 PtgDevice*
-PtgDevice_New(void* (*load_symbol)(const char* name))
+PtgDevice_New(const ptg_gl_symbol_loader gl_symbol_loader, void* logger_data, ptg_log_callback logger_func)
 {
   auto* device = new ptg_device;
 
-  if (!load_symbol)
-    device->impl = ptg::create_cpu_device();
+  if (!gl_symbol_loader)
+    device->impl = ptg::create_cpu_device(logger_data, logger_func);
 
   return device;
 }
@@ -34,13 +34,19 @@ struct ptg_model
 PtgModel*
 PtgModel_New(PtgDevice* device)
 {
-  return new ptg_model();
+  return new ptg_model{ ptg::model(device->impl) };
 }
 
 void
 PtgModel_Delete(PtgModel* model)
 {
   delete model;
+}
+
+void
+PtgModel_SetBrushSize(PtgModel* model, float brush_size)
+{
+  model->impl.set_brush_size(brush_size);
 }
 
 void
@@ -86,7 +92,6 @@ PtgOutput_Delete(PtgOutput* output)
 uint32_t
 PtgOutput_PrepareBake(PtgOutput* output, PtgModel* model)
 {
-
   return output->impl.prepare_bake(model->impl);
 }
 

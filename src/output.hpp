@@ -50,6 +50,22 @@ public:
   bool iterate_bake();
 
 private:
+  void apply_raise_operation(const path& p);
+
+  /// @brief Gets a texture associated with a specific layer.
+  ///
+  /// @param layer The layer to get the texture of.
+  ///
+  /// @return The texture of the specified layer.
+  texture* get_layer_texture(PtgLayer layer);
+
+  /// @brief Sets the texture associated with a specific layer.
+  ///
+  /// @param layer The layer to set the texture of.
+  ///
+  /// @param t The texture to assign the layer.
+  void set_layer_texture(PtgLayer layer, texture* t);
+
   /// @brief Used to store data related to a bake job.
   struct bake_job final
   {

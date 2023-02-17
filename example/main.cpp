@@ -1,22 +1,46 @@
 #include <ptg.h>
 
+#include <stdio.h>
 #include <stdlib.h>
-
 #include <math.h>
 
 #include "stb_image_write.h"
 
+static void
+log_callback(void* callback_data, const PtgSeverity severity, const char* msg)
+{
+  (void)callback_data;
+
+  switch (severity) {
+    case PTG_INFO:
+      printf("INFO: ");
+      break;
+    case PTG_WARN:
+      printf("WARN: ");
+      break;
+    case PTG_ERROR:
+      printf("ERROR: ");
+      break;
+  }
+
+  printf("%s\n", msg);
+}
+
 int
 main()
 {
-  PtgDevice* device = PtgDevice_New(NULL);
+  PtgDevice* device = PtgDevice_New(NULL, NULL, log_callback);
 
   PtgModel* model = PtgModel_New(device);
 
+  PtgModel_SetBrushSize(model, 25.0f);
+
   PtgModel_BeginPath(model);
 
-  for (int i = 0; i < 16; i++)
-    PtgModel_PlotPath(model, i, 8 * std::sin(6.28 * i / 16.0f));
+  const int steps = 128;
+
+  for (int i = 0; i < steps; i++)
+    PtgModel_PlotPath(model, i * 1000.0f / steps, 500.0f + 500.0f * sin(6.28f * static_cast<float>(i) / steps));
 
   PtgModel_EndPath(model);
 

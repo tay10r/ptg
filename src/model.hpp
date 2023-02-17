@@ -1,17 +1,27 @@
 #pragma once
 
+#include "device.hpp"
+
 #include <optional>
 #include <vector>
+#include <memory>
 
 #include <stdint.h>
+
+#include "ptg.h"
 
 namespace ptg {
 
 struct path final
 {
-  float brush_size{ 4.0f };
+  /// The size of the brush applying the path.
+  float brush_size{ 16.0f };
 
+  /// The coordinates of each point in the path.
   std::vector<float> xy_coordinates;
+
+  /// The layer on which to apply this path.
+  PtgLayer layer;
 };
 
 enum class operation_kind
@@ -41,11 +51,21 @@ struct memento final
 
   /// The operations, in order, to apply to the terrain when baking.
   std::vector<operation> operations;
+
+  /// The currently selected layer.
+  PtgLayer active_layer{ PTG_LAYER_ROCK };
 };
 
 class model final
 {
 public:
+  /// @brief Constructs a new model instance.
+  ///
+  /// @parma dev The device responsible for creating the model.
+  explicit model(std::shared_ptr<device> dev);
+
+  void set_brush_size(float brush_size);
+
   void begin_path();
 
   void end_path();
@@ -60,14 +80,17 @@ public:
   ///        Used when starting a bake operation.
   ///
   /// @return A copy of the current memento.
-  memento copy_current_memento() const;
+  [[nodiscard]] memento copy_current_memento() const;
 
 private:
-  const memento* current() const { return &mementos_.at(memento_index_); }
+  [[nodiscard]] const memento* current() const { return &mementos_.at(memento_index_); }
 
   memento* edit();
 
 private:
+  /// The device that constructed this model.
+  std::shared_ptr<device> device_;
+
   uint32_t memento_index_{ 0 };
 
   std::vector<memento> mementos_{ memento{} };
