@@ -8,7 +8,7 @@ class texture
 public:
   texture() = default;
 
-  texture(const texture&) = delete;
+  texture(const texture&) = default;
 
   texture(texture&&) = default;
 

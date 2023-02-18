@@ -44,6 +44,13 @@ public:
   /// @param t The texture to release the memory of.
   virtual void destroy_texture(texture* t) = 0;
 
+  /// @brief Creates a copy of a texture.
+  ///
+  /// @param src The texture to copy.
+  ///
+  /// @return A pointer to the copied texture.
+  virtual texture* copy_texture(texture* src) = 0;
+
   /// @brief Gets the kernel registry for the device.
   ///
   /// @return A pointer to the kernel registry for the device.

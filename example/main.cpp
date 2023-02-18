@@ -41,7 +41,7 @@ main()
 
   PtgModel_BeginPath(model);
 
-  const int steps = 32;
+  const int steps = 1;
 
   for (int i = 0; i < steps; i++)
     PtgModel_PlotPath(model, i * 1000.0f / steps, 500.0f + 500.0f * sin(6.28f * static_cast<float>(i) / steps));
@@ -52,7 +52,7 @@ main()
   // Compute Output Terrain //
   //========================//
 
-  PtgOutput* output = PtgOutput_New(device, 256);
+  PtgOutput* output = PtgOutput_New(device, 16);
 
   const auto step_count = PtgOutput_PrepareBake(output, model);
 
@@ -65,7 +65,7 @@ main()
   // Render Terrain //
   //================//
 
-  PtgRender* render = PtgRender_New(device, 512);
+  PtgRender* render = PtgRender_New(device, 1024);
 
   PtgRender_SetCameraPosition(render, 0, 10, 0);
 
@@ -73,7 +73,7 @@ main()
 
   PtgRender_SetCameraPerspective(render, 1.0f, 45.0f, 0.01f, 2000.0f);
 
-  for (int i = 0; i < 16; i++)
+  for (int i = 0; i < 128; i++)
     PtgRender_Iterate(render);
 
   PtgRender_SavePng(render, "render.png", stbi_write_png);

@@ -21,6 +21,8 @@ public:
   {
   }
 
+  explicit cpu_texture(const cpu_texture& other) = default;
+
   void read_data(float* data) override
   {
     for (uint32_t y = 0; y < size_; y++) {
@@ -77,6 +79,17 @@ public:
         return;
       }
     }
+  }
+
+  texture* copy_texture(texture* src) override
+  {
+    auto tmp = std::make_unique<cpu_texture>(*dynamic_cast<cpu_texture*>(src));
+
+    const auto ptr = tmp.get();
+
+    textures_.emplace_back(std::move(tmp));
+
+    return ptr;
   }
 
   const kernel_registry* get_kernel_registry() override

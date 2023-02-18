@@ -31,6 +31,10 @@ render::iterate()
 
   const auto camera_rotation_location = kern->get_uniform_location("camera_rotation");
 
+  const auto unit_sphere_location = kern->get_uniform_location("unit_sphere_sample");
+
+  const auto pixel_coordinate_location = kern->get_uniform_location("pixel_coordinate");
+
   const auto work_group_count = glm::uvec2(image_size, image_size) / device_->get_work_group_size();
 
   kern->set_active_texture(0, color_);
@@ -44,6 +48,10 @@ render::iterate()
   kern->set_uniform_vec3(camera_position_location, camera_.position);
 
   kern->set_uniform_vec3(camera_rotation_location, camera_.rotation);
+
+  kern->set_uniform_vec3(unit_sphere_location, sample_unit_sphere());
+
+  kern->set_uniform_vec2(pixel_coordinate_location, sample_unit_square());
 
   kern->dispatch(work_group_count);
 
@@ -97,6 +105,28 @@ render::save_to_png(const char* path, ptg_write_png png_writer) const
   }
 
   return !!png_writer(path, image_size, image_size, 4, ldr_color.data(), image_size * 4u);
+}
+
+glm::vec2
+render::sample_unit_square()
+{
+  std::uniform_real_distribution<float> dist(0, 1);
+
+  return { dist(rng_), dist(rng_) };
+}
+
+glm::vec3
+render::sample_unit_sphere()
+{
+  std::uniform_real_distribution<float> dist(-1, 1);
+
+  while (true) {
+    glm::vec3 v(dist(rng_), dist(rng_), dist(rng_));
+    if (dot(v, v) <= 1.0f)
+      return normalize(v);
+  }
+
+  return { 0, 1, 0 };
 }
 
 } // namespace ptg
